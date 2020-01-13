@@ -5,7 +5,7 @@ from time import sleep
 block_width = 25
 block_height = 15
 
-
+bg = pygame.image.load('arkanoid_bg.png')
 
 class Block(pygame.sprite.Sprite):
 
@@ -57,7 +57,6 @@ class Ball(pygame.sprite.Sprite):
 
     
         self.rect = self.image.get_rect()
-
     
         self.screenheight = pygame.display.get_surface().get_height()
         self.screenwidth = pygame.display.get_surface().get_width()
