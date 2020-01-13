@@ -76,7 +76,7 @@ class Ball(pygame.sprite.Sprite):
 
         self.rect.x = self.x
         self.rect.y = self.y
-
+#  тут отскоко
         if self.y <= 0:
             self.bounce(0)
             self.y = 1
@@ -88,7 +88,7 @@ class Ball(pygame.sprite.Sprite):
         if self.x > self.screenwidth - self.width:
             self.direction = (360 - self.direction) % 360
             self.x = self.screenwidth - self.width - 1
-
+# умер
         if self.y > 600:
             return True
         else:
@@ -122,6 +122,7 @@ class Player(pygame.sprite.Sprite):
 
 
 def main(lvl):
+    global font
     pygame.init()
 
     life = 3
@@ -132,7 +133,7 @@ def main(lvl):
 
     pygame.mouse.set_visible(0)
 
-    font = pygame.font.Font(None, 36)
+    font = pygame.font.Font('game_font.ttf', 36)
 
     background = pygame.Surface(screen.get_size())
 
@@ -180,6 +181,7 @@ def main(lvl):
 
     while not exit_program:
         screen.blit(bg, (0, 0))
+        screen.blit(font.render('Press "Q" to exit', 1, pygame.Color('yellow')), (10, 560))
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
               if event.key == pygame.K_q:
@@ -199,7 +201,8 @@ def main(lvl):
                 ball = Ball()
                 allsprites.add(ball)
                 balls.add(ball)
-                text = font.render(f"Lifes:{life}", True, pygame.Color('white'))
+                # шрифты добавить
+                text = font.render(f"Lifes - {life}", True, pygame.Color('green'))
                 textpos = text.get_rect(centerx=background.get_width() / 2)
                 textpos.top = 300
                 screen.blit(text, textpos)
@@ -226,17 +229,17 @@ def main(lvl):
         three_lvl_deadblocks = pygame.sprite.spritecollide(ball, three_lvl_blocks, False)
 
         if len(deadblocks) > 0:
-            ball.bounce(0)
+            ball.bounce(0)# тут отскоко
             for i in range(len(deadblocks)):
                 if deadblocks[i].kill_life() == 0:
                     deadblocks[i].kill()
         if len(two_lvl_deadblocks) > 0:
-            ball.bounce(0)
+            ball.bounce(0) # тут отскоко
             for i in range(len(two_lvl_deadblocks)):
                 if two_lvl_deadblocks[i].kill_life() == 0:
                     two_lvl_deadblocks[i].kill()
         if len(three_lvl_deadblocks) > 0:
-            ball.bounce(0)
+            ball.bounce(0)# тут отскоко
             for i in range(len(three_lvl_deadblocks)):
                 if three_lvl_deadblocks[i].kill_life() == 0:
                     three_lvl_deadblocks[i].kill()
@@ -257,4 +260,3 @@ def run():
             break
         if k == 'EXIT':
             break
-
