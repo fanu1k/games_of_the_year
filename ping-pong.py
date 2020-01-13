@@ -20,16 +20,20 @@ window = pygame.display.set_mode(scr_size)
 pygame.display.set_caption('Ping-Pong')
 
 bg = pygame.image.load('game_bg.png')
+
+
+font = pygame.font.Font('game_font.ttf', 32)
+
 rect_y = -20
 for _ in range(31):
     rect_y += 20
-    time.sleep(0.25)
+    time.sleep(0.15)
     pygame.draw.rect(window, pygame.Color('red'), (width//2,rect_y, 10, 10))
     pygame.display.update()
 
-def displaytext(text, fontsize, x, y, color):
-    font = pygame.font.SysFont('sawasdee', fontsize, True)
-    text = font.render(text, 1, color)
+def displaytext(text, fontsize, x, y):
+    global font
+    text = font.render(text, 1, pygame.Color('yellow'))
     textpos = text.get_rect(centerx=x, centery=y)
     window.blit(text, textpos)
 
@@ -162,8 +166,8 @@ def main():
         paddle.draw()
         cpu.draw()
         ball.draw()
-        displaytext(str(paddle.points), 20, width/8, 25, (255, 255, 255))
-        displaytext(str(cpu.points), 20, width - width/8, 25, (255, 255, 255))
+        displaytext(str(paddle.points), 20, width/8, 25)
+        displaytext(str(cpu.points), 20, width - width/8, 25)
         if pygame.sprite.collide_mask(paddle, ball):
             ball.movement[0] = -1*ball.movement[0]
             ball.movement[1] = ball.movement[1] - \
