@@ -181,6 +181,9 @@ def main(lvl):
     while not exit_program:
         screen.blit(bg, (0, 0))
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+              if event.key == pygame.K_q:
+                  return 'EXIT'
             if event.type == pygame.QUIT:
                 exit_program = True
 
@@ -249,5 +252,9 @@ def main(lvl):
 
 def run():
     for i in range(0, 10):
-        if not main(i):
+        tmp = main(i)
+        if not k:
             break
+        if k == 'EXIT':
+            break
+
