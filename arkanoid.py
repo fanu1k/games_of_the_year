@@ -50,17 +50,17 @@ class Ball(pygame.sprite.Sprite):
 
         self.image = pygame.Surface([self.width, self.height])
 
-        self.image.fill(pygame.Color('white'))
+        self.image.fill(pygame.Color('yellow'))
 
         self.rect = self.image.get_rect()
 
         self.screenheight = pygame.display.get_surface().get_height()
         self.screenwidth = pygame.display.get_surface().get_width()
 
-        self.speed = 7
+        self.speed = 1
 
     def nxt_lvl(self, lvl):
-        self.speed = 7 + 1 * lvl
+        self.speed = 1 #+ 1 * lvl
 
     def bounce(self, diff):
 
@@ -104,7 +104,7 @@ class Player(pygame.sprite.Sprite):
         self.width = 75
         self.height = 15
         self.image = pygame.Surface([self.width, self.height])
-        self.image.fill((pygame.Color('white')))
+        self.image.fill((pygame.Color('purple')))
 
         self.rect = self.image.get_rect()
         self.screenheight = pygame.display.get_surface().get_height()
@@ -250,5 +250,5 @@ def main(lvl):
 
 if '__main__' == __name__:
     for i in range(0, 10):
-        if not main(i):
+        if not main(5):
             break
