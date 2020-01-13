@@ -18,19 +18,10 @@ clock = pygame.time.Clock()
 
 
 window = pygame.display.set_mode(scr_size)
-pygame.display.set_caption('Ping-Pong')
-
 bg = pygame.image.load('game_bg.png')
 
 
 font = pygame.font.Font('game_font.ttf', 32)
-
-rect_y = -20
-for _ in range(31):
-    rect_y += 20
-    time.sleep(0.15)
-    pygame.draw.rect(window, pygame.Color('red'), (width//2,rect_y, 10, 10))
-    pygame.display.update()
 
 def displaytext(text, fontsize, x, y):
     global font
@@ -145,10 +136,17 @@ class Bot(pygame.sprite.Sprite):
 
 def main():
     gameOver = False
-    paddle = Racket(width/10, height/2, width/60, height/8)
+    window.fill(pygame.Color('black'))
+    pygame.display.set_caption('Ping-Pong')
+    # rect_y = -20
+    # for _ in range(31):
+    #     rect_y += 20
+    #     time.sleep(0.15)
+    #     pygame.draw.rect(window, pygame.Color('red'), (width//2,rect_y, 10, 10))
+    #     pygame.display.update()
+    playerRacket = Racket(width/10, height/2, width/60, height/8)
     cpu = Racket(width - width/10, height/2, width/60, height/8)
     ball = Ball(width/2, height/2, 12, [4, 4])
-
     while not gameOver:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -157,23 +155,24 @@ def main():
                 if event.key == pygame.K_q:
                     return
                 if event.key == pygame.K_UP:
-                    paddle.movement[1] = -8
+                    playerRacket.movement[1] = -8
                 elif event.key == pygame.K_DOWN:
-                    paddle.movement[1] = 8
+                    playerRacket.movement[1] = 8
             if event.type == pygame.KEYUP:
-                paddle.movement[1] = 0
+                playerRacket.movement[1] = 0
         Bot.cpumove(cpu, ball)
         window.blit(bg, (0,0))
 
-        paddle.draw()
+        playerRacket.draw()
         cpu.draw()
         ball.draw()
-        displaytext(str(paddle.points), 20, width/8, 25)
+        displaytext(str(playerRacket.points), 20, width/8, 25)
         displaytext(str(cpu.points), 20, width - width/8, 25)
-        if pygame.sprite.collide_mask(paddle, ball):
+        displaytext('Press "Q" to exit', 15, width/8, 580)
+        if pygame.sprite.collide_mask(playerRacket, ball):
             ball.movement[0] = -1*ball.movement[0]
             ball.movement[1] = ball.movement[1] - \
-                int(0.1*random.randrange(5, 10)*paddle.movement[1])
+                int(0.1*random.randrange(5, 10)*playerRacket.movement[1])
             if ball.movement[1] > ball.maxspeed:
                 ball.movement[1] = ball.maxspeed
             if ball.movement[1] < -1*ball.maxspeed:
@@ -189,7 +188,7 @@ def main():
             cpu.points += 1
             ball.score = 0
         elif ball.score == -1:
-            paddle.points += 1
+            playerRacket.points += 1
             ball.score = 0
         if cpu.points == 10:
             displaytext('You lost', 80, width/2, 300)
@@ -197,13 +196,13 @@ def main():
             sleep(2)
             pygame.quit()
             quit()
-        if paddle.points == 10:
+        if playerRacket.points == 10:
             displaytext('You win', 80, width/2, 300)
             pygame.display.update()
             sleep(2)
             pygame.quit()
             quit()
-        paddle.update()
+        playerRacket.update()
         ball.update()
         cpu.update()
         pygame.display.update()
