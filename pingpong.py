@@ -153,12 +153,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                  if event.key == pygame.K_q:
-                      return "Exit"
-
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    return
                 if event.key == pygame.K_UP:
                     paddle.movement[1] = -8
                 elif event.key == pygame.K_DOWN:
@@ -215,5 +212,4 @@ def main():
     quit()
 
 def run():
-    if main() == "Exit":
-        break
+    main()
