@@ -2,10 +2,10 @@ import pygame
 from pygame.locals import *
 import os
 import arkanoid
+import pingpong
 pygame.init()
 
 bg = pygame.image.load('main_bg.png')
-
 os.environ['SDL_VIDEO_CENTERED'] = '1'
  
 screen_width=800
@@ -47,35 +47,44 @@ def main_menu():
                 if event.key==pygame.K_UP:
                     selected="arkanoid"
                 elif event.key==pygame.K_DOWN:
-                    selected="ping-pong"
+                    selected="pingpong"
                 if event.key==pygame.K_RETURN:
                     if selected=="arkanoid":
-                        arkanoid.run()
-                    if selected=="quit":
-                        pass
-                        
+                        try:
+                            arkanoid.run()
+                        except Exception:
+                            pass
+                    if selected=="pingpong":
+                        try:
+                            pingpong.run()
+                        except Exception:
+                            pass
+
  
         screen.blit(bg, (0, 0))
-        title=text_format("Top Games", font, 90, yellow)
-        if selected=="start":
-            text_start=text_format("START", font, 75, white)
+        title = text_format("top games", font, 90, yellow)
+        if selected == "arkanoid":
+            text_arkanoid = text_format("arkanoid", font, 75, white)
         else:
-            text_start = text_format("START", font, 75, black)
-        if selected=="quit":
-            text_quit=text_format("QUIT", font, 75, white)
+            text_arkanoid = text_format("arkanoid", font, 75, black)
+        if selected == "pingpong":
+            text_quit=text_format("pingpong", font, 75, white)
         else:
-            text_quit = text_format("QUIT", font, 75, black)
+            text_quit = text_format("pingpong", font, 75, black)
  
         title_rect=title.get_rect()
-        start_rect=text_start.get_rect()
+        start_rect=text_arkanoid.get_rect()
         quit_rect=text_quit.get_rect()
  
         screen.blit(title, (screen_width/2 - (title_rect[2]/2), 80))
-        screen.blit(text_start, (screen_width/2 - (start_rect[2]/2), 300))
+        screen.blit(text_arkanoid, (screen_width/2 - (start_rect[2]/2), 300))
         screen.blit(text_quit, (screen_width/2 - (quit_rect[2]/2), 360))
         pygame.display.update()
         clock.tick(FPS)
         pygame.display.set_caption("Top games")
-main_menu()
+try:
+    main_menu()
+except Exception:
+    pass
 pygame.quit()
 quit()

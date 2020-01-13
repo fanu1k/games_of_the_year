@@ -5,6 +5,7 @@ import time
 import math
 import random
 from pygame.locals import *
+from time import sleep
 
 pygame.init()
 
@@ -189,6 +190,18 @@ def main():
         elif ball.score == -1:
             paddle.points += 1
             ball.score = 0
+        if cpu.points == 10:
+            displaytext('You lost', 80, width/2, 300)
+            pygame.display.update()
+            sleep(2)
+            pygame.quit()
+            quit()
+        if paddle.points == 10:
+            displaytext('You win', 80, width/2, 300)
+            pygame.display.update()
+            sleep(2)
+            pygame.quit()
+            quit()
         paddle.update()
         ball.update()
         cpu.update()
@@ -197,5 +210,6 @@ def main():
     pygame.quit()
     quit()
 
-
-main()
+def run():
+    main()
+run()
