@@ -6,8 +6,9 @@ import math
 import random
 from pygame.locals import *
 from time import sleep
-
+from pygame import mixer
 pygame.init()
+mixer.init()
 
 FPS = 60
 
@@ -22,6 +23,22 @@ bg = pygame.image.load('game_bg.png')
 
 
 font = pygame.font.Font('game_font.ttf', 32)
+
+wall_hit_sound = mixer.Sound('wall.wav')
+racket_hit_sound = mixer.Sound('racket.wav')
+lose_sound = mixer.Sound('lose.wav')
+
+
+def music(number):
+    global wall_hit_sound
+    global racket_hit_sound
+    if number == 1:
+        wall_hit_sound.play(0)
+    elif number == 2:
+        lose_sound.play(0)
+    else:
+        racket_hit_sound.play(0)
+
 
 def displaytext(text, fontsize, x, y):
     global font
@@ -97,17 +114,20 @@ class Ball(pygame.sprite.Sprite):
     def update(self):
         if self.rect.top == 0 or self.rect.bottom == height:
             self.movement[1] = -1*self.movement[1]
+            music(1)
         if self.rect.left == 0:
             self.rect.centerx = width/2
             self.rect.centery = height/2
             self.movement = [random.randrange(-1, 2, 2)*4, random.randrange(-1, 2, 2)*4]
             self.score = 1
+            music(2)
 
         if self.rect.right == width:
             self.rect.centerx = width/2
             self.rect.centery = height/2
             self.movement = [random.randrange(-1, 2, 2)*4, random.randrange(-1, 2, 2)*4]
             self.score = -1
+            music(2)
 
         self.rect = self.rect.move(self.movement)
         self.checkbounds()
@@ -161,7 +181,7 @@ def main():
             if event.type == pygame.KEYUP:
                 playerRacket.movement[1] = 0
         Bot.cpumove(cpu, ball)
-        window.blit(bg, (0,0))
+        window.blit(bg, (0, 0))
 
         playerRacket.draw()
         cpu.draw()
@@ -177,6 +197,7 @@ def main():
                 ball.movement[1] = ball.maxspeed
             if ball.movement[1] < -1*ball.maxspeed:
                 ball.movement[1] = -1*ball.maxspeed
+            music(0)
         if pygame.sprite.collide_mask(cpu, ball):
             ball.movement[0] = -1*ball.movement[0]
             ball.movement[1] = ball.movement[1] - int(0.1*random.randrange(5, 10)*cpu.movement[1])
@@ -184,6 +205,7 @@ def main():
                 ball.movement[1] = ball.maxspeed
             if ball.movement[1] < -1*ball.maxspeed:
                 ball.movement[1] = -1*ball.maxspeed
+            music(0)
         if ball.score == 1:
             cpu.points += 1
             ball.score = 0
@@ -191,17 +213,15 @@ def main():
             playerRacket.points += 1
             ball.score = 0
         if cpu.points == 10:
-            displaytext('You lost', 80, width/2, 300)
+            displaytext('You lose', 80, width/2, 300)
             pygame.display.update()
             sleep(2)
-            pygame.quit()
-            quit()
+            return
         if playerRacket.points == 10:
             displaytext('You win', 80, width/2, 300)
             pygame.display.update()
             sleep(2)
-            pygame.quit()
-            quit()
+            return
         playerRacket.update()
         ball.update()
         cpu.update()
@@ -209,6 +229,7 @@ def main():
         clock.tick(FPS)
     pygame.quit()
     quit()
+
 
 def run():
     main()

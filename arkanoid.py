@@ -1,11 +1,28 @@
 import math
 import pygame
+from pygame import mixer
 from random import randint as rnd
 from time import sleep
+pygame.init()
+mixer.init()
+
 block_width = 25
 block_height = 15
 
 bg = pygame.image.load('arkanoid_bg.png')
+
+wall_hit_sound = mixer.Sound('arcanoid_wall.wav')
+destroy_sound = mixer.Sound('arcanoid_brick.wav')
+lose_life_sound = mixer.Sound('lose.wav')
+
+
+def music(number):
+    if number == 1:
+        wall_hit_sound.play(0)
+    elif number == 2:
+        lose_life_sound.play(0)
+    else:
+        destroy_sound.play(0)
 
 
 class Block(pygame.sprite.Sprite):
@@ -76,20 +93,20 @@ class Ball(pygame.sprite.Sprite):
 
         self.rect.x = self.x
         self.rect.y = self.y
-#  тут отскоко
         if self.y <= 0:
             self.bounce(0)
             self.y = 1
-
+            music(1)
         if self.x <= 0:
             self.direction = (360 - self.direction) % 360
             self.x = 1
-
+            music(1)
         if self.x > self.screenwidth - self.width:
             self.direction = (360 - self.direction) % 360
             self.x = self.screenwidth - self.width - 1
-# умер
+            music(1)
         if self.y > 600:
+            music(2)
             return True
         else:
             return False
@@ -184,8 +201,8 @@ def main(lvl):
         screen.blit(font.render('Press "Q" to exit', 1, pygame.Color('yellow')), (10, 560))
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-              if event.key == pygame.K_q:
-                  return 'EXIT'
+                if event.key == pygame.K_q:
+                    return 'EXIT'
             if event.type == pygame.QUIT:
                 exit_program = True
 
@@ -201,20 +218,19 @@ def main(lvl):
                 ball = Ball()
                 allsprites.add(ball)
                 balls.add(ball)
-                # шрифты добавить
                 text = font.render(f"Lifes - {life}", True, pygame.Color('green'))
                 textpos = text.get_rect(centerx=background.get_width() / 2)
                 textpos.top = 300
                 screen.blit(text, textpos)
                 pygame.display.flip()
-                sleep(2)
+                sleep(0.75)
             else:
                 text = font.render("Game Over", True, pygame.Color('white'))
                 textpos = text.get_rect(centerx=background.get_width() / 2)
                 textpos.top = 300
                 screen.blit(text, textpos)
                 pygame.display.flip()
-                sleep(2)
+                sleep(0.75)
                 return False
 
         if pygame.sprite.spritecollide(player, balls, False):
@@ -223,23 +239,27 @@ def main(lvl):
                 (ball.rect.x + ball.width / 2)
             ball.rect.y = screen.get_height() - player.rect.height - ball.rect.height - 1
             ball.bounce(diff)
+            music(1)
 
         deadblocks = pygame.sprite.spritecollide(ball, blocks, False)
         two_lvl_deadblocks = pygame.sprite.spritecollide(ball, two_lvl_blocks, False)
         three_lvl_deadblocks = pygame.sprite.spritecollide(ball, three_lvl_blocks, False)
 
         if len(deadblocks) > 0:
-            ball.bounce(0)# тут отскоко
+            ball.bounce(0)
+            music(0)
             for i in range(len(deadblocks)):
                 if deadblocks[i].kill_life() == 0:
                     deadblocks[i].kill()
         if len(two_lvl_deadblocks) > 0:
-            ball.bounce(0) # тут отскоко
+            ball.bounce(0)
+            music(0)
             for i in range(len(two_lvl_deadblocks)):
                 if two_lvl_deadblocks[i].kill_life() == 0:
                     two_lvl_deadblocks[i].kill()
         if len(three_lvl_deadblocks) > 0:
-            ball.bounce(0)# тут отскоко
+            ball.bounce(0)
+            music(0)
             for i in range(len(three_lvl_deadblocks)):
                 if three_lvl_deadblocks[i].kill_life() == 0:
                     three_lvl_deadblocks[i].kill()
@@ -252,6 +272,7 @@ def main(lvl):
         pygame.display.flip()
 
     pygame.quit()
+
 
 def run():
     for i in range(0, 10):
