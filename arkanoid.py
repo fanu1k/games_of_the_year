@@ -6,6 +6,8 @@ from time import sleep
 pygame.init()
 mixer.init()
 
+screen = pygame.display.set_mode([800, 600])
+
 block_width = 25
 block_height = 15
 
@@ -15,6 +17,17 @@ wall_hit_sound = mixer.Sound('arcanoid_wall.wav')
 destroy_sound = mixer.Sound('arcanoid_brick.wav')
 lose_life_sound = mixer.Sound('lose.wav')
 
+font = pygame.font.Font('game_font.ttf', 36)
+scores = 0
+
+def displaytext(text, x, y, color, flag):
+    global font
+    text = font.render(text, 1, color)
+    textpos = text.get_rect(centerx=x, centery=y)
+    if flag:
+        textpos.top = 300
+    screen.blit(text, textpos)
+
 
 def music(number):
     if number == 1:
@@ -23,6 +36,7 @@ def music(number):
         lose_life_sound.play(0)
     else:
         destroy_sound.play(0)
+
 
 class Bonus(pygame.sprite.Sprite):
 
@@ -36,13 +50,11 @@ class Bonus(pygame.sprite.Sprite):
 
         self.rect.x = 50
         self.rect.y = 50
-    
+
     def update(self, pos):
         self.pos = pos
         self.rect.x = pos[0]
         self.rect.y = pos[1]
-
-        
 
 
 class Block(pygame.sprite.Sprite):
@@ -60,10 +72,11 @@ class Block(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.lifes = lifes
-        if rnd(0,100) < 100:
+        if rnd(0, 100) < 100:
             self.bonus = True
         else:
             self.bonus = False
+
     def bonused(self):
         return True if self.bonus else False
 
@@ -79,7 +92,7 @@ class Block(pygame.sprite.Sprite):
 
 
 class Ball(pygame.sprite.Sprite):
-
+    global scores
     x = 0.0
     y = 170.0
 
@@ -166,18 +179,13 @@ class Player(pygame.sprite.Sprite):
 
 def main(lvl):
     global font
+    global scores
     pygame.init()
 
     life = 3
 
-    screen = pygame.display.set_mode([800, 600])
-
     pygame.display.set_caption('Arkanoid')
-
     pygame.mouse.set_visible(0)
-
-    font = pygame.font.Font('game_font.ttf', 36)
-
     background = pygame.Surface(screen.get_size())
 
     blocks = pygame.sprite.Group()
@@ -186,18 +194,17 @@ def main(lvl):
     two_lvl_blocks = pygame.sprite.Group()
     three_lvl_blocks = pygame.sprite.Group()
     bonuses = pygame.sprite.Group()
+
     player = Player()
-    allsprites.add(player)
-
     bonus = Bonus()
-
     ball = Ball()
+
+    allsprites.add(player)
     allsprites.add(ball)
     balls.add(ball)
     ball.nxt_lvl(lvl)
 
     top = 80
-
     blockcount = 32
 
     for row in range(5):
@@ -226,7 +233,6 @@ def main(lvl):
 
     while not exit_program:
         screen.blit(bg, (0, 0))
-        screen.blit(font.render('Press "Q" to exit', 1, pygame.Color('yellow')), (10, 560))
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
@@ -247,17 +253,12 @@ def main(lvl):
                 ball.nxt_lvl(lvl)
                 allsprites.add(ball)
                 balls.add(ball)
-                text = font.render(f"Lifes - {life}", True, pygame.Color('green'))
-                textpos = text.get_rect(centerx=background.get_width() / 2)
-                textpos.top = 300
-                screen.blit(text, textpos)
+                displaytext(f"Lifes - {life}", 400, 300, pygame.Color('green'), True)
+                scores -= 100
                 pygame.display.flip()
                 sleep(0.75)
             else:
-                text = font.render("Game Over", True, pygame.Color('white'))
-                textpos = text.get_rect(centerx=background.get_width() / 2)
-                textpos.top = 300
-                screen.blit(text, textpos)
+                displaytext("Game over", 400, 300, pygame.Color('white'), True)
                 pygame.display.flip()
                 sleep(0.75)
                 return False
@@ -282,22 +283,27 @@ def main(lvl):
                     if deadblocks[i].bonused():
                         bonus.update([50, 50])
                     deadblocks[i].kill()
+                    scores += 10
         if len(two_lvl_deadblocks) > 0:
             ball.bounce(0)
             music(0)
             for i in range(len(two_lvl_deadblocks)):
                 if two_lvl_deadblocks[i].kill_life() == 0:
                     two_lvl_deadblocks[i].kill()
+                    scores += 10
         if len(three_lvl_deadblocks) > 0:
             ball.bounce(0)
             music(0)
             for i in range(len(three_lvl_deadblocks)):
                 if three_lvl_deadblocks[i].kill_life() == 0:
                     three_lvl_deadblocks[i].kill()
+                    scores += 10
 
         if len(blocks) + len(two_lvl_blocks) + len(three_lvl_blocks) == 0:
             return True
 
+        displaytext(f'scores {str(scores)}', 60, 10, pygame.Color('white'), False)
+        displaytext('Press "Q" to exit', 110, 580, pygame.Color('yellow'), False)
         allsprites.draw(screen)
         clock.tick(30)
         pygame.display.flip()
@@ -305,8 +311,7 @@ def main(lvl):
     pygame.quit()
 
 
-def run():
-    for i in range(0, 10):
-        tmp = main(5)
-        if not tmp:
-            break
+for i in range(0, 10):
+    tmp = main(i)
+    if not tmp:
+        break

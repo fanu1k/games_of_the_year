@@ -12,18 +12,16 @@ screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 
+clock = pygame.time.Clock()
+FPS = 30
+
+font = "game_font.ttf"
+
 
 def text_format(message, textFont, textSize, textColor):
     newFont = pygame.font.Font(textFont, textSize)
     newText = newFont.render(message, 0, textColor)
     return newText
-
-
-font = "game_font.ttf"
-
-
-clock = pygame.time.Clock()
-FPS = 30
 
 
 def main_menu():
