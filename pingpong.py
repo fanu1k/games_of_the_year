@@ -22,7 +22,7 @@ window = pygame.display.set_mode(scr_size)
 bg = pygame.image.load('game_bg.png')
 
 
-font = pygame.font.Font('game_font.ttf', 32)
+font = pygame.font.Font('game_font.ttf', 45)
 
 wall_hit_sound = mixer.Sound('wall.wav')
 racket_hit_sound = mixer.Sound('racket.wav')
@@ -46,6 +46,19 @@ def displaytext(text, fontsize, x, y):
     textpos = text.get_rect(centerx=x, centery=y)
     window.blit(text, textpos)
 
+def countdown_animation():
+    global font
+    beep = pygame.mixer.Sound('beep1.wav')
+    count = 3
+    while count > 0:
+        window.fill(pygame.Color('black'))
+        font_size = font.size(str(count))
+        textpos = [width/2 - font_size[0]/2, height/2 - font_size[1]/2]
+        window.blit(font.render(str(count), True, pygame.Color('orange'), pygame.Color('black')), textpos)
+        pygame.display.flip()
+        beep.play()
+        count -= 1
+        pygame.time.delay(1000)
 
 class Racket(pygame.sprite.Sprite):
     def __init__(self, x, y, sizex, sizey):
@@ -155,6 +168,7 @@ class Bot(pygame.sprite.Sprite):
 
 
 def main():
+    countdown_animation()
     gameOver = False
     window.fill(pygame.Color('black'))
     pygame.display.set_caption('Ping-Pong')
@@ -188,7 +202,7 @@ def main():
         ball.draw()
         displaytext(str(playerRacket.points), 20, width/8, 25)
         displaytext(str(cpu.points), 20, width - width/8, 25)
-        displaytext('Press "Q" to exit', 15, width/8, 580)
+        displaytext('Press "Q" to exit', 15, width/8 + 20, 580)
         if pygame.sprite.collide_mask(playerRacket, ball):
             ball.movement[0] = -1*ball.movement[0]
             ball.movement[1] = ball.movement[1] - \
