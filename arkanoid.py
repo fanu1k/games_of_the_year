@@ -307,6 +307,6 @@ def main(lvl):
 
 def run():
     for i in range(0, 10):
-        tmp = main(0)
+        tmp = main(5)
         if not tmp:
             break
