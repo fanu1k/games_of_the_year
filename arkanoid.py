@@ -202,7 +202,7 @@ def main(lvl):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
-                    return 'EXIT'
+                    return None
             if event.type == pygame.QUIT:
                 exit_program = True
 
@@ -216,6 +216,7 @@ def main(lvl):
                 game_over = False
                 ball.kill()
                 ball = Ball()
+                ball.nxt_lvl(lvl)
                 allsprites.add(ball)
                 balls.add(ball)
                 text = font.render(f"Lifes - {life}", True, pygame.Color('green'))
@@ -277,7 +278,5 @@ def main(lvl):
 def run():
     for i in range(0, 10):
         tmp = main(i)
-        if not k:
-            break
-        if k == 'EXIT':
+        if not tmp:
             break
