@@ -19,15 +19,6 @@ def text_format(message, textFont, textSize, textColor):
     return newText
 
 
-white = (255, 255, 255)
-black = (0, 0, 0)
-gray = (50, 50, 50)
-red = (255, 0, 0)
-green = (0, 255, 0)
-blue = (0, 0, 255)
-yellow = (255, 255, 0)
-
-
 font = "game_font.ttf"
 
 
@@ -63,15 +54,15 @@ def main_menu():
                             pass
 
         screen.blit(bg, (0, 0))
-        title = text_format("top games", font, 90, yellow)
+        title = text_format("top games", font, 90, pygame.Color('yellow'))
         if selected == "arkanoid":
-            text_arkanoid = text_format("arkanoid", font, 75, white)
+            text_arkanoid = text_format("arkanoid", font, 75, pygame.Color('white'))
         else:
-            text_arkanoid = text_format("arkanoid", font, 75, black)
+            text_arkanoid = text_format("arkanoid", font, 75, pygame.Color('black'))
         if selected == "pingpong":
-            text_quit = text_format("pingpong", font, 75, white)
+            text_quit = text_format("pingpong", font, 75, pygame.Color('white'))
         else:
-            text_quit = text_format("pingpong", font, 75, black)
+            text_quit = text_format("pingpong", font, 75, pygame.Color('black'))
 
         title_rect = title.get_rect()
         start_rect = text_arkanoid.get_rect()
@@ -89,5 +80,6 @@ try:
     main_menu()
 except Exception:
     pass
+
 pygame.quit()
 quit()

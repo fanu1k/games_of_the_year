@@ -24,6 +24,26 @@ def music(number):
     else:
         destroy_sound.play(0)
 
+class Bonus(pygame.sprite.Sprite):
+
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface([block_width, block_height])
+
+        self.image.fill(pygame.Color('blue'))
+
+        self.rect = self.image.get_rect()
+
+        self.rect.x = 50
+        self.rect.y = 50
+    
+    def update(self, pos):
+        self.pos = pos
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+
+        
+
 
 class Block(pygame.sprite.Sprite):
 
@@ -40,6 +60,12 @@ class Block(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.lifes = lifes
+        if rnd(0,100) < 100:
+            self.bonus = True
+        else:
+            self.bonus = False
+    def bonused(self):
+        return True if self.bonus else False
 
     def kill_life(self):
         self.lifes -= 1
@@ -159,9 +185,11 @@ def main(lvl):
     allsprites = pygame.sprite.Group()
     two_lvl_blocks = pygame.sprite.Group()
     three_lvl_blocks = pygame.sprite.Group()
-
+    bonuses = pygame.sprite.Group()
     player = Player()
     allsprites.add(player)
+
+    bonus = Bonus()
 
     ball = Ball()
     allsprites.add(ball)
@@ -251,6 +279,8 @@ def main(lvl):
             music(0)
             for i in range(len(deadblocks)):
                 if deadblocks[i].kill_life() == 0:
+                    if deadblocks[i].bonused():
+                        bonus.update([50, 50])
                     deadblocks[i].kill()
         if len(two_lvl_deadblocks) > 0:
             ball.bounce(0)
@@ -277,6 +307,6 @@ def main(lvl):
 
 def run():
     for i in range(0, 10):
-        tmp = main(i)
+        tmp = main(0)
         if not tmp:
             break
