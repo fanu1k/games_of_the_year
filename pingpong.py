@@ -173,12 +173,6 @@ def main():
     gameOver = False
     window.fill(pygame.Color('black'))
     pygame.display.set_caption('Ping-Pong')
-    # rect_y = -20
-    # for _ in range(31):
-    #     rect_y += 20
-    #     time.sleep(0.15)
-    #     pygame.draw.rect(window, pygame.Color('red'), (width//2,rect_y, 10, 10))
-    #     pygame.display.update()
     playerRacket = Racket(width/10, height/2, width/60, height/8)
     cpu = Racket(width - width/10, height/2, width/60, height/8)
     ball = Ball(width/2, height/2, 12, [4, 4])
@@ -201,12 +195,13 @@ def main():
             continue
         Bot.cpumove(cpu, ball)
         window.blit(bg, (0, 0))
+        displaytext('Press "Q" to exit', 8, 120, 580)
+        displaytext('Press "ESC" to pause', 8, 640, 580)
         playerRacket.draw()
         cpu.draw()
         ball.draw()
         displaytext(str(playerRacket.points), 20, width/8, 25)
         displaytext(str(cpu.points), 20, width - width/8, 25)
-        displaytext('Press "Q" to exit', 15, width/8 + 20, 580)
         if pygame.sprite.collide_mask(playerRacket, ball):
             ball.movement[0] = -1*ball.movement[0]
             ball.movement[1] = ball.movement[1] - \

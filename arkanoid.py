@@ -15,6 +15,20 @@ wall_hit_sound = mixer.Sound('arcanoid_wall.wav')
 destroy_sound = mixer.Sound('arcanoid_brick.wav')
 lose_life_sound = mixer.Sound('lose.wav')
 
+font = pygame.font.Font('game_font.ttf', 36)
+
+screen = pygame.display.set_mode([800, 600])
+
+scores = 0
+
+def displaytext(text,x, y, color, flag):
+    global font
+    text = font.render(text, 1, color)
+    textpos = text.get_rect(centerx=x, centery=y)
+    if flag:
+        textpos.top = 300
+    screen.blit(text, textpos)
+
 
 def music(number):
     if number == 1:
@@ -200,17 +214,14 @@ class Player(pygame.sprite.Sprite):
 def main(lvl):
     pause = False
     global font
+    global scores
     pygame.init()
 
     life = 3
 
-    screen = pygame.display.set_mode([800, 600])
-
     pygame.display.set_caption('Arkanoid')
 
     pygame.mouse.set_visible(0)
-
-    font = pygame.font.Font('game_font.ttf', 36)
 
     background = pygame.Surface(screen.get_size())
 
@@ -258,10 +269,10 @@ def main(lvl):
 
     while not exit_program:
         screen.blit(bg, (0, 0))
-        screen.blit(font.render('Press "Q" to exit', 1,
-                                pygame.Color('yellow')), (10, 560))
-        screen.blit(font.render(f'lifes - {life}', 1,
-                                pygame.Color('yellow')), (700, 560))
+        displaytext('Press "Q" to exit', 110, 570 , pygame.Color('yellow'), False)
+        displaytext(f'lifes - {life}', 730, 50, pygame.Color('red'), False)
+        displaytext(f'scores: {str(scores)}', 70, 50, pygame.Color('white'), False)
+        displaytext(f'Press "ESC" to pause', 660, 570, pygame.Color('yellow'), False)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
@@ -292,18 +303,12 @@ def main(lvl):
                     ball.nxt_lvl(lvl)
                     allsprites.add(ball)
                     balls.add(ball)
-                    text = font.render(f"Lifes - {life}", True, pygame.Color('green'))
-                    textpos = text.get_rect(centerx=background.get_width() / 2)
-                    textpos.top = 300
-                    screen.blit(text, textpos)
+                    displaytext(f"Lifes - {life}", 400, 300, pygame.Color('green'), True)
                     pygame.display.flip()
                     sleep(0.75)
+                    scores -= 100
                 else:
-                    text = font.render("Game Over", True,
-                                       pygame.Color('white'))
-                    textpos = text.get_rect(centerx=background.get_width() / 2)
-                    textpos.top = 300
-                    screen.blit(text, textpos)
+                    displaytext("Game Over", 400, 300, pygame.Color('white'), True)
                     pygame.display.flip()
                     sleep(0.75)
                     return False
@@ -362,7 +367,7 @@ def main(lvl):
             three_lvl_deadblocks = pygame.sprite.spritecollide(
                 ball, three_lvl_blocks, False)
             if (len(deadblocks) + len(two_lvl_deadblocks) + len(three_lvl_deadblocks)) > 0:
-                #Здесь сделай прибавление очков
+                scores += 10
                 if not ball.isfire():
                     ball.bounce(0)
                     music(0)
@@ -395,11 +400,7 @@ def main(lvl):
                     three_lvl_deadblocks[i].kill()
 
         if len(blocks) == 0:
-            text = font.render(f"lvl {lvl+2}", True,
-                                       pygame.Color('white'))
-            textpos = text.get_rect(centerx=background.get_width() / 2)
-            textpos.top = 300
-            screen.blit(text, textpos)
+            displaytext(f"lvl {lvl+2}", 400, 300,pygame.Color('white'), True)
             pygame.display.flip()
             sleep(1)
             return True
