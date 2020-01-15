@@ -362,6 +362,7 @@ def main(lvl):
             three_lvl_deadblocks = pygame.sprite.spritecollide(
                 ball, three_lvl_blocks, False)
             if (len(deadblocks) + len(two_lvl_deadblocks) + len(three_lvl_deadblocks)) > 0:
+                #Здесь сделай прибавление очков
                 if not ball.isfire():
                     ball.bounce(0)
                     music(0)
