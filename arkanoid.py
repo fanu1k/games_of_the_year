@@ -40,14 +40,44 @@ def music(number):
 
 class Bonus(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, coord):
         super().__init__()
-        self.image = pygame.Surface([block_width, block_height])
 
-        self.image.fill(pygame.Color('blue'))
-
+        self.image = pygame.Surface([15, 15])
+        bonus = rnd(1, 7)
+        if bonus == 1:
+            self.image.fill(pygame.Color("green"))
+            self.skill = 'balls'
+        if bonus == 2:
+            self.image.fill(pygame.Color("white"))
+            self.skill = 'normal'
+        if bonus == 3:
+            self.image.fill(pygame.Color("pink"))
+            self.skill = 'slow'
+        if bonus == 4:
+            self.image.fill(pygame.Color("gray"))
+            self.skill = 'fast'
+        if bonus == 5:
+            self.image.fill(pygame.Color("purple"))
+            self.skill = 'life'
+        if bonus == 6:
+            self.image.fill(pygame.Color("blue"))
+            self.skill = '-width'
+        if bonus == 7:
+            self.image.fill(pygame.Color("red"))
+            self.skill = 'fireball'
         self.rect = self.image.get_rect()
+        self.rect.x = coord[0]
+        self.rect.y = coord[-1]
 
+<<<<<<< HEAD
+    def update(self):
+        self.rect.y += 5
+
+    def bonus_skill(self):
+        return self.skill
+
+=======
         self.rect.x = 50
         self.rect.y = 50
 
@@ -56,6 +86,10 @@ class Bonus(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
+<<<<<<< Updated upstream
+=======
+>>>>>>> master
+>>>>>>> Stashed changes
 
 class Block(pygame.sprite.Sprite):
 
@@ -68,7 +102,7 @@ class Block(pygame.sprite.Sprite):
         self.image.fill(color)
 
         self.rect = self.image.get_rect()
-
+        self.coordinat = [x, y]
         self.rect.x = x
         self.rect.y = y
         self.lifes = lifes
@@ -78,7 +112,10 @@ class Block(pygame.sprite.Sprite):
             self.bonus = False
 
     def bonused(self):
-        return True if self.bonus else False
+        return self.bonus
+
+    def coord(self):
+        return self.coordinat
 
     def kill_life(self):
         self.lifes -= 1
@@ -92,34 +129,42 @@ class Block(pygame.sprite.Sprite):
 
 
 class Ball(pygame.sprite.Sprite):
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
     global scores
     x = 0.0
     y = 170.0
+>>>>>>> master
 
     direction = 220
 
     width = 10
     height = 10
 
-    def __init__(self):
+    def __init__(self, x=0.0, fire=False):
         super().__init__()
-
+        self.fire = fire
         self.image = pygame.Surface([self.width, self.height])
-
-        self.image.fill(pygame.Color('yellow'))
-
+        if self.fire:
+            color = pygame.Color('red')
+        else:
+            color = pygame.Color('yellow')
+        self.image.fill(color)
+        self.x = x
+        self.y = 270.0
         self.rect = self.image.get_rect()
 
         self.screenheight = pygame.display.get_surface().get_height()
         self.screenwidth = pygame.display.get_surface().get_width()
-
         self.speed = 7
 
     def nxt_lvl(self, lvl):
         self.speed = 7 + 1 * lvl
 
     def bounce(self, diff):
-
         self.direction = (180 - self.direction) % 360
         self.direction -= diff
 
@@ -150,14 +195,23 @@ class Ball(pygame.sprite.Sprite):
         else:
             return False
 
+    def isfire(self):
+        return self.fire
+
+    def slow_speed(self):
+        self.speed = 7
+
+    def high_speed(self):
+        self.speed = 20
+
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, width=75):
 
         super().__init__()
 
-        self.width = 75
+        self.width = width
         self.height = 15
         self.image = pygame.Surface([self.width, self.height])
         self.image.fill((pygame.Color('purple')))
@@ -169,9 +223,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = self.screenheight-self.height
 
-    def update(self):
-
-        pos = pygame.mouse.get_pos()
+    def update(self, new_pos=True):
+        if new_pos:
+            pos = pygame.mouse.get_pos()
+        else:
+            pos = [10000, 10000]
         self.rect.x = pos[0]
         if self.rect.x > self.screenwidth - self.width:
             self.rect.x = self.screenwidth - self.width
@@ -194,9 +250,22 @@ def main(lvl):
     two_lvl_blocks = pygame.sprite.Group()
     three_lvl_blocks = pygame.sprite.Group()
     bonuses = pygame.sprite.Group()
+<<<<<<< Updated upstream
 
     player = Player()
     bonus = Bonus()
+=======
+<<<<<<< HEAD
+
+    player = Player()
+    allsprites.add(player)
+
+=======
+
+    player = Player()
+    bonus = Bonus()
+>>>>>>> master
+>>>>>>> Stashed changes
     ball = Ball()
 
     allsprites.add(player)
@@ -233,6 +302,17 @@ def main(lvl):
 
     while not exit_program:
         screen.blit(bg, (0, 0))
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+        screen.blit(font.render('Press "Q" to exit', 1,
+                                pygame.Color('yellow')), (10, 560))
+        screen.blit(bg, (0, 0))
+        screen.blit(font.render(f'lifes - {life}', 1,
+                                pygame.Color('yellow')), (700, 560))
+=======
+>>>>>>> master
+>>>>>>> Stashed changes
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
@@ -242,9 +322,44 @@ def main(lvl):
 
         if not game_over:
             player.update()
-            game_over = ball.update()
+            for bal in balls:
+                tmp = bal.update()
+                if tmp:
+                    bal.kill()
+                    game_over = tmp
+            bonuses.update()
 
         if game_over:
+<<<<<<< HEAD
+            game_over = False
+            if len(balls) == 0:
+                if life:
+                    life -= 1
+                    for i in balls:
+                        i.kill()
+                    ball = Ball()
+                    ball.nxt_lvl(lvl)
+                    allsprites.add(ball)
+                    balls.add(ball)
+                    text = font.render(f"Lifes - {life}", True, pygame.Color('green'))
+                    textpos = text.get_rect(centerx=background.get_width() / 2)
+                    textpos.top = 300
+                    screen.blit(text, textpos)
+                    pygame.display.flip()
+                    sleep(0.75)
+                else:
+                    text = font.render("Game Over", True,
+                                       pygame.Color('white'))
+                    textpos = text.get_rect(centerx=background.get_width() / 2)
+                    textpos.top = 300
+                    screen.blit(text, textpos)
+                    pygame.display.flip()
+                    sleep(0.75)
+                    return False
+
+        collide_ball = pygame.sprite.spritecollide(player, balls, False)
+        if len(collide_ball) > 0:
+=======
             if life:
                 life -= 1
                 game_over = False
@@ -265,41 +380,99 @@ def main(lvl):
 
         if pygame.sprite.spritecollide(player, balls, False):
 
+>>>>>>> master
             diff = (player.rect.x + player.width / 2) - \
-                (ball.rect.x + ball.width / 2)
-            ball.rect.y = screen.get_height() - player.rect.height - ball.rect.height - 1
-            ball.bounce(diff)
+                (collide_ball[-1].rect.x + collide_ball[-1].width / 2)
+            collide_ball[-1].rect.y = screen.get_height() - \
+                player.rect.height - collide_ball[-1].rect.height - 1
+            collide_ball[-1].bounce(diff)
             music(1)
 
-        deadblocks = pygame.sprite.spritecollide(ball, blocks, False)
-        two_lvl_deadblocks = pygame.sprite.spritecollide(ball, two_lvl_blocks, False)
-        three_lvl_deadblocks = pygame.sprite.spritecollide(ball, three_lvl_blocks, False)
+        deadbonus = pygame.sprite.spritecollide(player, bonuses, True)
+
+        if len(deadbonus) > 0:
+            bonus = deadbonus[0]
+            if bonus.bonus_skill() == 'balls':
+                for _ in range(3):
+                    ball = Ball(rnd(10, 790))
+                    allsprites.add(ball)
+                    balls.add(ball)
+                    ball.nxt_lvl(lvl)
+                    ball.bounce(rnd(0, 360))
+            elif bonus.bonus_skill() == '-width':
+                player.update(False)
+                player.kill()
+                player = Player(30)
+                allsprites.add(player)
+            elif bonus.bonus_skill() == 'normal':
+                player.update(False)
+                player.kill()
+                player = Player()
+                allsprites.add(player)
+            elif bonus.bonus_skill() == 'fireball':
+                ball = Ball(rnd(10, 790), fire=True)
+                allsprites.add(ball)
+                balls.add(ball)
+                ball.nxt_lvl(lvl)
+                ball.bounce(rnd(0, 360))
+            elif bonus.bonus_skill() == 'slow':
+                for ball in balls:
+                    ball.slow_speed()
+            elif bonus.bonus_skill() == 'fast':
+                for ball in balls:
+                    ball.high_speed()
+            elif bonus.bonus_skill() == 'life':
+                life += 1
+
+        for ball in balls:
+            deadblocks = pygame.sprite.spritecollide(ball, blocks, False)
+            two_lvl_deadblocks = pygame.sprite.spritecollide(
+                ball, two_lvl_blocks, False)
+            three_lvl_deadblocks = pygame.sprite.spritecollide(
+                ball, three_lvl_blocks, False)
+            if (len(deadblocks) + len(two_lvl_deadblocks) + len(three_lvl_deadblocks)) > 0:
+                if not ball.isfire():
+                    ball.bounce(0)
+                    music(0)
+                break
 
         if len(deadblocks) > 0:
-            ball.bounce(0)
-            music(0)
             for i in range(len(deadblocks)):
                 if deadblocks[i].kill_life() == 0:
                     if deadblocks[i].bonused():
-                        bonus.update([50, 50])
+                        bonus = Bonus(deadblocks[i].coord())
+                        bonuses.add(bonus)
+                        allsprites.add(bonus)
                     deadblocks[i].kill()
+<<<<<<< Updated upstream
                     scores += 10
+=======
+<<<<<<< HEAD
+
+=======
+                    scores += 10
+>>>>>>> master
+>>>>>>> Stashed changes
         if len(two_lvl_deadblocks) > 0:
-            ball.bounce(0)
-            music(0)
             for i in range(len(two_lvl_deadblocks)):
                 if two_lvl_deadblocks[i].kill_life() == 0:
+                    if two_lvl_deadblocks[i].bonused():
+                        bonus = Bonus(two_lvl_deadblocks[i].coord())
+                        bonuses.add(bonus)
+                        allsprites.add(bonus)
                     two_lvl_deadblocks[i].kill()
                     scores += 10
         if len(three_lvl_deadblocks) > 0:
-            ball.bounce(0)
-            music(0)
             for i in range(len(three_lvl_deadblocks)):
                 if three_lvl_deadblocks[i].kill_life() == 0:
+                    if three_lvl_deadblocks[i].bonused():
+                        bonus = Bonus(three_lvl_deadblocks[i].coord())
+                        bonuses.add(bonus)
+                        allsprites.add(bonus)
                     three_lvl_deadblocks[i].kill()
                     scores += 10
 
-        if len(blocks) + len(two_lvl_blocks) + len(three_lvl_blocks) == 0:
+        if len(blocks) == 0:
             return True
 
         displaytext(f'scores {str(scores)}', 60, 10, pygame.Color('white'), False)
@@ -311,7 +484,24 @@ def main(lvl):
     pygame.quit()
 
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+def run():
+    for i in range(0, 10):
+        tmp = main(1)
+        if not tmp:
+            break
+
+
+run()
+=======
+>>>>>>> Stashed changes
 for i in range(0, 10):
     tmp = main(i)
     if not tmp:
         break
+<<<<<<< Updated upstream
+=======
+>>>>>>> master
+>>>>>>> Stashed changes
