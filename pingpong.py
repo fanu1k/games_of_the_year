@@ -168,6 +168,7 @@ class Bot(pygame.sprite.Sprite):
 
 
 def main():
+    pause = False
     countdown_animation()
     gameOver = False
     window.fill(pygame.Color('black'))
@@ -186,6 +187,8 @@ def main():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pause = False if pause else True
                 if event.key == pygame.K_q:
                     return
                 if event.key == pygame.K_UP:
@@ -194,9 +197,10 @@ def main():
                     playerRacket.movement[1] = 8
             if event.type == pygame.KEYUP:
                 playerRacket.movement[1] = 0
+        if pause:
+            continue
         Bot.cpumove(cpu, ball)
         window.blit(bg, (0, 0))
-
         playerRacket.draw()
         cpu.draw()
         ball.draw()
