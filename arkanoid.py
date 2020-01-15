@@ -79,7 +79,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.lifes = lifes
-        if rnd(0, 100) < 100:
+        if rnd(0, 100) < 40:
             self.bonus = True
         else:
             self.bonus = False
@@ -191,7 +191,7 @@ class Player(pygame.sprite.Sprite):
         if new_pos:
             pos = pygame.mouse.get_pos()
         else:
-            pos = [10000, 10000]
+            pos = [10000,]
         self.rect.x = pos[0]
         if self.rect.x > self.screenwidth - self.width:
             self.rect.x = self.screenwidth - self.width
@@ -331,11 +331,13 @@ def main(lvl):
                 player.kill()
                 player = Player(30)
                 allsprites.add(player)
+                player.update()
             elif bonus.bonus_skill() == 'normal':
                 player.update(False)
                 player.kill()
                 player = Player()
                 allsprites.add(player)
+                player.update()
             elif bonus.bonus_skill() == 'fireball':
                 ball = Ball(rnd(10, 790), fire=True)
                 allsprites.add(ball)
@@ -401,9 +403,6 @@ def main(lvl):
 
 def run():
     for i in range(0, 10):
-        tmp = main(1)
+        tmp = main(i)
         if not tmp:
             break
-
-
-run()
