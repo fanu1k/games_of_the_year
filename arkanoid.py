@@ -6,8 +6,6 @@ from time import sleep
 pygame.init()
 mixer.init()
 
-screen = pygame.display.set_mode([800, 600])
-
 block_width = 25
 block_height = 15
 
@@ -16,17 +14,6 @@ bg = pygame.image.load('arkanoid_bg.png')
 wall_hit_sound = mixer.Sound('arcanoid_wall.wav')
 destroy_sound = mixer.Sound('arcanoid_brick.wav')
 lose_life_sound = mixer.Sound('lose.wav')
-
-font = pygame.font.Font('game_font.ttf', 36)
-scores = 0
-
-def displaytext(text, x, y, color, flag):
-    global font
-    text = font.render(text, 1, color)
-    textpos = text.get_rect(centerx=x, centery=y)
-    if flag:
-        textpos.top = 300
-    screen.blit(text, textpos)
 
 
 def music(number):
@@ -70,26 +57,12 @@ class Bonus(pygame.sprite.Sprite):
         self.rect.x = coord[0]
         self.rect.y = coord[-1]
 
-<<<<<<< HEAD
     def update(self):
         self.rect.y += 5
 
     def bonus_skill(self):
         return self.skill
 
-=======
-        self.rect.x = 50
-        self.rect.y = 50
-
-    def update(self, pos):
-        self.pos = pos
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-<<<<<<< Updated upstream
-=======
->>>>>>> master
->>>>>>> Stashed changes
 
 class Block(pygame.sprite.Sprite):
 
@@ -129,15 +102,6 @@ class Block(pygame.sprite.Sprite):
 
 
 class Ball(pygame.sprite.Sprite):
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
-    global scores
-    x = 0.0
-    y = 170.0
->>>>>>> master
 
     direction = 220
 
@@ -235,13 +199,18 @@ class Player(pygame.sprite.Sprite):
 
 def main(lvl):
     global font
-    global scores
     pygame.init()
 
     life = 3
 
+    screen = pygame.display.set_mode([800, 600])
+
     pygame.display.set_caption('Arkanoid')
+
     pygame.mouse.set_visible(0)
+
+    font = pygame.font.Font('game_font.ttf', 36)
+
     background = pygame.Surface(screen.get_size())
 
     blocks = pygame.sprite.Group()
@@ -250,30 +219,17 @@ def main(lvl):
     two_lvl_blocks = pygame.sprite.Group()
     three_lvl_blocks = pygame.sprite.Group()
     bonuses = pygame.sprite.Group()
-<<<<<<< Updated upstream
-
-    player = Player()
-    bonus = Bonus()
-=======
-<<<<<<< HEAD
 
     player = Player()
     allsprites.add(player)
 
-=======
-
-    player = Player()
-    bonus = Bonus()
->>>>>>> master
->>>>>>> Stashed changes
     ball = Ball()
-
-    allsprites.add(player)
     allsprites.add(ball)
     balls.add(ball)
     ball.nxt_lvl(lvl)
 
     top = 80
+
     blockcount = 32
 
     for row in range(5):
@@ -302,17 +258,11 @@ def main(lvl):
 
     while not exit_program:
         screen.blit(bg, (0, 0))
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
         screen.blit(font.render('Press "Q" to exit', 1,
                                 pygame.Color('yellow')), (10, 560))
         screen.blit(bg, (0, 0))
         screen.blit(font.render(f'lifes - {life}', 1,
                                 pygame.Color('yellow')), (700, 560))
-=======
->>>>>>> master
->>>>>>> Stashed changes
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
@@ -330,7 +280,6 @@ def main(lvl):
             bonuses.update()
 
         if game_over:
-<<<<<<< HEAD
             game_over = False
             if len(balls) == 0:
                 if life:
@@ -359,28 +308,6 @@ def main(lvl):
 
         collide_ball = pygame.sprite.spritecollide(player, balls, False)
         if len(collide_ball) > 0:
-=======
-            if life:
-                life -= 1
-                game_over = False
-                ball.kill()
-                ball = Ball()
-                ball.nxt_lvl(lvl)
-                allsprites.add(ball)
-                balls.add(ball)
-                displaytext(f"Lifes - {life}", 400, 300, pygame.Color('green'), True)
-                scores -= 100
-                pygame.display.flip()
-                sleep(0.75)
-            else:
-                displaytext("Game over", 400, 300, pygame.Color('white'), True)
-                pygame.display.flip()
-                sleep(0.75)
-                return False
-
-        if pygame.sprite.spritecollide(player, balls, False):
-
->>>>>>> master
             diff = (player.rect.x + player.width / 2) - \
                 (collide_ball[-1].rect.x + collide_ball[-1].width / 2)
             collide_ball[-1].rect.y = screen.get_height() - \
@@ -444,15 +371,7 @@ def main(lvl):
                         bonuses.add(bonus)
                         allsprites.add(bonus)
                     deadblocks[i].kill()
-<<<<<<< Updated upstream
-                    scores += 10
-=======
-<<<<<<< HEAD
 
-=======
-                    scores += 10
->>>>>>> master
->>>>>>> Stashed changes
         if len(two_lvl_deadblocks) > 0:
             for i in range(len(two_lvl_deadblocks)):
                 if two_lvl_deadblocks[i].kill_life() == 0:
@@ -461,7 +380,6 @@ def main(lvl):
                         bonuses.add(bonus)
                         allsprites.add(bonus)
                     two_lvl_deadblocks[i].kill()
-                    scores += 10
         if len(three_lvl_deadblocks) > 0:
             for i in range(len(three_lvl_deadblocks)):
                 if three_lvl_deadblocks[i].kill_life() == 0:
@@ -470,13 +388,10 @@ def main(lvl):
                         bonuses.add(bonus)
                         allsprites.add(bonus)
                     three_lvl_deadblocks[i].kill()
-                    scores += 10
 
         if len(blocks) == 0:
             return True
 
-        displaytext(f'scores {str(scores)}', 60, 10, pygame.Color('white'), False)
-        displaytext('Press "Q" to exit', 110, 580, pygame.Color('yellow'), False)
         allsprites.draw(screen)
         clock.tick(30)
         pygame.display.flip()
@@ -484,9 +399,6 @@ def main(lvl):
     pygame.quit()
 
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
 def run():
     for i in range(0, 10):
         tmp = main(1)
@@ -495,13 +407,3 @@ def run():
 
 
 run()
-=======
->>>>>>> Stashed changes
-for i in range(0, 10):
-    tmp = main(i)
-    if not tmp:
-        break
-<<<<<<< Updated upstream
-=======
->>>>>>> master
->>>>>>> Stashed changes
