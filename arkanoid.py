@@ -198,6 +198,7 @@ class Player(pygame.sprite.Sprite):
 
 
 def main(lvl):
+    pause = False
     global font
     pygame.init()
 
@@ -230,11 +231,10 @@ def main(lvl):
 
     top = 80
 
-    blockcount = 32
+    blockcount = 30
 
     for row in range(5):
         for column in range(0, blockcount):
-
             if rnd(0, 100) < (7 * lvl):
                 block = Block(pygame.Color('orange'), column *
                               (block_width + 2) + 1, top, 3)
@@ -260,24 +260,26 @@ def main(lvl):
         screen.blit(bg, (0, 0))
         screen.blit(font.render('Press "Q" to exit', 1,
                                 pygame.Color('yellow')), (10, 560))
-        screen.blit(bg, (0, 0))
         screen.blit(font.render(f'lifes - {life}', 1,
                                 pygame.Color('yellow')), (700, 560))
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     return None
+                if event.key == pygame.K_ESCAPE:
+                    pause = False if pause else True
             if event.type == pygame.QUIT:
                 exit_program = True
 
         if not game_over:
-            player.update()
-            for bal in balls:
-                tmp = bal.update()
-                if tmp:
-                    bal.kill()
-                    game_over = tmp
-            bonuses.update()
+            if not pause:
+                player.update()
+                for bal in balls:
+                    tmp = bal.update()
+                    if tmp:
+                        bal.kill()
+                        game_over = tmp
+                bonuses.update()
 
         if game_over:
             game_over = False
@@ -392,6 +394,13 @@ def main(lvl):
                     three_lvl_deadblocks[i].kill()
 
         if len(blocks) == 0:
+            text = font.render(f"lvl {lvl+2}", True,
+                                       pygame.Color('white'))
+            textpos = text.get_rect(centerx=background.get_width() / 2)
+            textpos.top = 300
+            screen.blit(text, textpos)
+            pygame.display.flip()
+            sleep(1)
             return True
 
         allsprites.draw(screen)
