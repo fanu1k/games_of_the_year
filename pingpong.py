@@ -4,6 +4,7 @@ import sys
 import time
 import math
 import random
+import shelve
 from pygame.locals import *
 from time import sleep
 from pygame import mixer
@@ -19,14 +20,14 @@ clock = pygame.time.Clock()
 
 
 window = pygame.display.set_mode(scr_size)
-bg = pygame.image.load('game_bg.png')
+bg = pygame.image.load('data/game_bg.png')
 
 
 font = pygame.font.Font('game_font.ttf', 45)
 
-wall_hit_sound = mixer.Sound('wall.wav')
-racket_hit_sound = mixer.Sound('racket.wav')
-lose_sound = mixer.Sound('lose.wav')
+wall_hit_sound = mixer.Sound('sounds/wall.wav')
+racket_hit_sound = mixer.Sound('sounds/racket.wav')
+lose_sound = mixer.Sound('sounds/lose.wav')
 
 
 def music(number):
@@ -46,19 +47,22 @@ def displaytext(text, fontsize, x, y):
     textpos = text.get_rect(centerx=x, centery=y)
     window.blit(text, textpos)
 
+
 def countdown_animation():
     global font
-    beep = pygame.mixer.Sound('beep1.wav')
+    beep = pygame.mixer.Sound('sounds/beep1.wav')
     count = 3
     while count > 0:
         window.fill(pygame.Color('black'))
         font_size = font.size(str(count))
         textpos = [width/2 - font_size[0]/2, height/2 - font_size[1]/2]
-        window.blit(font.render(str(count), True, pygame.Color('orange'), pygame.Color('black')), textpos)
+        window.blit(font.render(str(count), True, pygame.Color(
+            'orange'), pygame.Color('black')), textpos)
         pygame.display.flip()
         beep.play()
         count -= 1
         pygame.time.delay(1000)
+
 
 class Racket(pygame.sprite.Sprite):
     def __init__(self, x, y, sizex, sizey):
@@ -131,7 +135,7 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.left == 0:
             self.rect.centerx = width/2
             self.rect.centery = height/2
-            self.movement = [random.randrange(-1, 2, 2)*4, random.randrange(-1, 2, 2)*4]
+            self.movement = [random.randrange(-1, 2, 2) * 4, random.randrange(-1, 2, 2) * 4]
             self.score = 1
             music(2)
 
@@ -155,26 +159,24 @@ class Bot(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-    def cpumove(cpu, ball):
+    def second_playerRacketmove(second_playerRacket, ball):
         if ball.movement[0] > 0:
-            if ball.rect.bottom > cpu.rect.bottom + cpu.rect.height/5:
-                cpu.movement[1] = 8
-            elif ball.rect.top < cpu.rect.top - cpu.rect.height/5:
-                cpu.movement[1] = -8
+            if ball.rect.bottom > second_playerRacket.rect.bottom + second_playerRacket.rect.height/5:
+                second_playerRacket.movement[1] = 8
+            elif ball.rect.top < second_playerRacket.rect.top - second_playerRacket.rect.height/5:
+                second_playerRacket.movement[1] = -8
             else:
-                cpu.movement[1] = 0
-        else:
-            cpu.movement[1] = 0
+                second_playerRacket.movement[1] = 0
 
 
-def main():
+def main(gametype):
     pause = False
     countdown_animation()
     gameOver = False
     window.fill(pygame.Color('black'))
     pygame.display.set_caption('Ping-Pong')
-    playerRacket = Racket(width/10, height/2, width/60, height/8)
-    cpu = Racket(width - width/10, height/2, width/60, height/8)
+    first_playerRacket = Racket(width/10, height/2, width/60, height/8)
+    second_playerRacket = Racket(width - width/10, height/2, width/60, height/8)
     ball = Ball(width/2, height/2, 12, [4, 4])
     while not gameOver:
         for event in pygame.event.get():
@@ -185,64 +187,74 @@ def main():
                     pause = False if pause else True
                 if event.key == pygame.K_q:
                     return
-                if event.key == pygame.K_UP:
-                    playerRacket.movement[1] = -8
-                elif event.key == pygame.K_DOWN:
-                    playerRacket.movement[1] = 8
+                if event.key == pygame.K_w:
+                    first_playerRacket.movement[1] = -8
+                elif event.key == pygame.K_s:
+                    first_playerRacket.movement[1] = 8
+                if gametype == 2:
+                    if event.key == pygame.K_UP:
+                        second_playerRacket.movement[1] = -8
+                    elif event.key == pygame.K_DOWN:
+                        second_playerRacket.movement[1] = 8
+
             if event.type == pygame.KEYUP:
-                playerRacket.movement[1] = 0
+                first_playerRacket.movement[1] = 0
+                if gametype == 2:
+                    second_playerRacket.movement[1] = 0
         if pause:
             continue
-        Bot.cpumove(cpu, ball)
+        if gametype == 1:
+            Bot.second_playerRacketmove(second_playerRacket, ball)
         window.blit(bg, (0, 0))
         displaytext('Press "Q" to exit', 8, 120, 580)
         displaytext('Press "ESC" to pause', 8, 640, 580)
-        playerRacket.draw()
-        cpu.draw()
+        first_playerRacket.draw()
+        second_playerRacket.draw()
         ball.draw()
-        displaytext(str(playerRacket.points), 20, width/8, 25)
-        displaytext(str(cpu.points), 20, width - width/8, 25)
-        if pygame.sprite.collide_mask(playerRacket, ball):
+        displaytext(str(first_playerRacket.points), 20, width/8, 25)
+        displaytext(str(second_playerRacket.points), 20, width - width/8, 25)
+        if pygame.sprite.collide_mask(first_playerRacket, ball):
             ball.movement[0] = -1*ball.movement[0]
             ball.movement[1] = ball.movement[1] - \
-                int(0.1*random.randrange(5, 10)*playerRacket.movement[1])
+                int(0.1*random.randrange(5, 10)*first_playerRacket.movement[1])
             if ball.movement[1] > ball.maxspeed:
                 ball.movement[1] = ball.maxspeed
             if ball.movement[1] < -1*ball.maxspeed:
                 ball.movement[1] = -1*ball.maxspeed
             music(0)
-        if pygame.sprite.collide_mask(cpu, ball):
+        if pygame.sprite.collide_mask(second_playerRacket, ball):
             ball.movement[0] = -1*ball.movement[0]
-            ball.movement[1] = ball.movement[1] - int(0.1*random.randrange(5, 10)*cpu.movement[1])
+            ball.movement[1] = ball.movement[1] - \
+                int(0.1*random.randrange(5, 10)*second_playerRacket.movement[1])
             if ball.movement[1] > ball.maxspeed:
                 ball.movement[1] = ball.maxspeed
             if ball.movement[1] < -1*ball.maxspeed:
                 ball.movement[1] = -1*ball.maxspeed
             music(0)
         if ball.score == 1:
-            cpu.points += 1
+            second_playerRacket.points += 1
             ball.score = 0
         elif ball.score == -1:
-            playerRacket.points += 1
+            first_playerRacket.points += 1
             ball.score = 0
-        if cpu.points == 10:
-            displaytext('You lose', 80, width/2, 300)
+        if second_playerRacket.points == 10:
+            displaytext('The second player won', 80, width/2, 300)
             pygame.display.update()
             sleep(2)
             return
-        if playerRacket.points == 10:
-            displaytext('You win', 80, width/2, 300)
+        if first_playerRacket.points == 10:
+            displaytext('The first player won', 80, width/2, 300)
             pygame.display.update()
             sleep(2)
             return
-        playerRacket.update()
+        first_playerRacket.update()
         ball.update()
-        cpu.update()
+        second_playerRacket.update()
         pygame.display.update()
         clock.tick(FPS)
     pygame.quit()
     quit()
 
 
-def run():
-    main()
+def run(gametype):
+    main(gametype)

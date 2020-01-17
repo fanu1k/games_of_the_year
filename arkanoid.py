@@ -1,25 +1,29 @@
 import math
 import pygame
+import shelve
 from pygame import mixer
 from random import randint as rnd
 from time import sleep
+import enter_name
+import sqlite3
 pygame.init()
 mixer.init()
 
 block_width = 25
 block_height = 15
 
-bg = pygame.image.load('arkanoid_bg.png')
+bg = pygame.image.load('data/arkanoid_bg.png')
 
-wall_hit_sound = mixer.Sound('arcanoid_wall.wav')
-destroy_sound = mixer.Sound('arcanoid_brick.wav')
-lose_life_sound = mixer.Sound('lose.wav')
+wall_hit_sound = mixer.Sound('sounds/arcanoid_wall.wav')
+destroy_sound = mixer.Sound('sounds/arcanoid_brick.wav')
+lose_life_sound = mixer.Sound('sounds/lose.wav')
 
 font = pygame.font.Font('game_font.ttf', 36)
 
 screen = pygame.display.set_mode([800, 600])
 
 scores = 0
+player_name = 0
 
 
 def displaytext(text, x, y, color, flag):
@@ -30,6 +34,14 @@ def displaytext(text, x, y, color, flag):
         textpos.top = 300
     screen.blit(text, textpos)
 
+
+def fill_table(player, scores):
+    conn = sqlite3.connect('leaders_base.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO leaders(player, scores) VALUES ('%s','%s')" % (
+        player, scores))
+    conn.commit()
+    conn.close()
 
 def music(number):
     if number == 1:
@@ -52,11 +64,11 @@ class Bonus(pygame.sprite.Sprite):
             self.skill = 'balls'
         if bonus == 2:
             self.image.fill(pygame.Color("white"))
-            self.skill = '+width'
+            self.skill = 'normal'
         if bonus == 3:
             self.image.fill(pygame.Color("pink"))
             self.skill = 'slow'
-        if bonus in 4:
+        if bonus == 4:
             self.image.fill(pygame.Color("gray"))
             self.skill = 'fast'
         if bonus == 5:
@@ -73,7 +85,7 @@ class Bonus(pygame.sprite.Sprite):
         self.rect.y = coord[-1]
 
     def update(self):
-        self.rect.y += 3
+        self.rect.y += 5
 
     def bonus_skill(self):
         return self.skill
@@ -94,7 +106,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.lifes = lifes
-        if rnd(0, 100) < 50:
+        if rnd(0, 100) < 40:
             self.bonus = True
         else:
             self.bonus = False
@@ -177,6 +189,12 @@ class Ball(pygame.sprite.Sprite):
     def isfire(self):
         return self.fire
 
+    def slow_speed(self):
+        self.speed = 7
+
+    def high_speed(self):
+        self.speed = 20
+
 
 class Player(pygame.sprite.Sprite):
 
@@ -184,7 +202,7 @@ class Player(pygame.sprite.Sprite):
 
         super().__init__()
 
-        self.width = width if width >= 15 else 15
+        self.width = width
         self.height = 15
         self.image = pygame.Surface([self.width, self.height])
         self.image.fill((pygame.Color('purple')))
@@ -210,6 +228,7 @@ def main(lvl):
     pause = False
     global font
     global scores
+    global user
     pygame.init()
 
     life = 3
@@ -264,18 +283,19 @@ def main(lvl):
 
     while not exit_program:
         screen.blit(bg, (0, 0))
-        displaytext('Press "Q" to exit', 110, 570,
-                    pygame.Color('yellow'), False)
+        displaytext('Press "Q" to exit', 110, 580, pygame.Color('yellow'), False)
         displaytext(f'lifes - {life}', 730, 50, pygame.Color('red'), False)
         displaytext(f'scores: {str(scores)}', 70, 50, pygame.Color('white'), False)
-        displaytext(f'Press "ESC" to pause', 660, 570, pygame.Color('yellow'), False)
+        displaytext(f'Press "ESC" to pause', 660, 580, pygame.Color('yellow'), False)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
+                    fill_table(player_name, scores)
                     return None
                 if event.key == pygame.K_ESCAPE:
                     pause = False if pause else True
             if event.type == pygame.QUIT:
+                fill_table(player_name, scores)
                 exit_program = True
 
         if not game_over:
@@ -304,15 +324,16 @@ def main(lvl):
                     sleep(0.75)
                     scores -= 100
                 else:
-                    displaytext("Game Over", 400, 300,
-                                pygame.Color('white'), True)
+                    displaytext("Game Over", 400, 300, pygame.Color('white'), True)
                     pygame.display.flip()
                     sleep(0.75)
+
                     return False
 
         collide_ball = pygame.sprite.spritecollide(player, balls, False)
         if len(collide_ball) > 0:
-            diff = 0
+            diff = (player.rect.x + player.width / 2) - \
+                (collide_ball[-1].rect.x + collide_ball[-1].width / 2)
             collide_ball[-1].rect.y = screen.get_height() - \
                 player.rect.height - collide_ball[-1].rect.height - 1
             collide_ball[-1].bounce(diff)
@@ -331,16 +352,14 @@ def main(lvl):
                     ball.bounce(rnd(0, 360))
             elif bonus.bonus_skill() == '-width':
                 player.update(False)
-                width = player.width
                 player.kill()
-                player = Player(width - 15)
+                player = Player(30)
                 allsprites.add(player)
                 player.update()
-            elif bonus.bonus_skill() == '+width':
+            elif bonus.bonus_skill() == 'normal':
                 player.update(False)
-                width = player.width
                 player.kill()
-                player = Player(width + 15)
+                player = Player()
                 allsprites.add(player)
                 player.update()
             elif bonus.bonus_skill() == 'fireball':
@@ -351,10 +370,10 @@ def main(lvl):
                 ball.bounce(rnd(0, 360))
             elif bonus.bonus_skill() == 'slow':
                 for ball in balls:
-                    ball.speed -= 2
+                    ball.slow_speed()
             elif bonus.bonus_skill() == 'fast':
                 for ball in balls:
-                    ball.speed += 2
+                    ball.high_speed()
             elif bonus.bonus_skill() == 'life':
                 life += 1
 
@@ -398,7 +417,7 @@ def main(lvl):
                     three_lvl_deadblocks[i].kill()
 
         if len(blocks) == 0:
-            displaytext(f"lvl {lvl + 2}", 400, 300, pygame.Color('white'), True)
+            displaytext(f"lvl {lvl+2}", 400, 300, pygame.Color('white'), True)
             pygame.display.flip()
             sleep(1)
             return True
@@ -407,12 +426,13 @@ def main(lvl):
         clock.tick(30)
         pygame.display.flip()
 
-    pygame.quit()
+    return None
 
 
 def run():
+    global player_name
+    player_name = enter_name.main()
     for i in range(0, 10):
         tmp = main(i)
         if not tmp:
             break
-run()
