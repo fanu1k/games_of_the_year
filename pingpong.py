@@ -170,6 +170,10 @@ class Bot(pygame.sprite.Sprite):
 
 
 def main(gametype):
+    move1_down = False
+    move1_up = False
+    move2_down = False
+    move2_up = False
     pause = False
     countdown_animation()
     gameOver = False
@@ -188,21 +192,38 @@ def main(gametype):
                 if event.key == pygame.K_q:
                     return
                 if event.key == pygame.K_w:
-                    first_playerRacket.movement[1] = -8
-                elif event.key == pygame.K_s:
-                    first_playerRacket.movement[1] = 8
-                if gametype == 2:
-                    if event.key == pygame.K_UP:
-                        second_playerRacket.movement[1] = -8
-                    elif event.key == pygame.K_DOWN:
-                        second_playerRacket.movement[1] = 8
-
+                    move1_up = True
+                if event.key == pygame.K_s:
+                    move1_down = True
+                if event.key == pygame.K_UP:
+                    move2_up = True
+                if event.key == pygame.K_DOWN:
+                    move2_down = True
             if event.type == pygame.KEYUP:
-                first_playerRacket.movement[1] = 0
-                if gametype == 2:
-                    second_playerRacket.movement[1] = 0
+                if event.key == pygame.K_w:
+                    move1_up = False
+                if event.key == pygame.K_s:
+                    move1_down = False
+                if event.key == pygame.K_UP:
+                    move2_up = False
+                if event.key == pygame.K_DOWN:
+                    move2_down = False
         if pause:
             continue
+        if move1_down:
+            first_playerRacket.movement[1] = 8
+        elif move1_up:
+            first_playerRacket.movement[1] = -8
+        else:
+            first_playerRacket.movement[1] = 0
+
+        if move2_down:
+            second_playerRacket.movement[1] = 8
+        elif move2_up:
+            second_playerRacket.movement[1] = -8
+        else:
+            second_playerRacket.movement[1] = 0
+
         if gametype == 1:
             Bot.second_playerRacketmove(second_playerRacket, ball)
         window.blit(bg, (0, 0))

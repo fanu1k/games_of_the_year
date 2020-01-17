@@ -139,7 +139,7 @@ class Block(pygame.sprite.Sprite):
 
 class Ball(pygame.sprite.Sprite):
 
-    direction = 220
+    direction = rnd(200, 250)
 
     width = 10
     height = 10
@@ -439,7 +439,7 @@ def run():
     global player_name
     player_name = enter_name.main()
     for i in range(0, 10):
-        tmp = main(i)
+        tmp = main(2)
         if not tmp:
             scores = 0
             break
