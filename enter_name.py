@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
-screen = pygame.display.set_mode((350, 200))
-font = pygame.font.Font('game_font.ttf', 28)
+screen = pygame.display.set_mode((800, 600))
+font = pygame.font.Font('game_font.ttf', 65)
 
 def displaytext(text, x, y, color):
     text = font.render(text, 1, color)
@@ -10,11 +10,11 @@ def displaytext(text, x, y, color):
 
 def main():
     player_name = ''
-    bg = pygame.image.load('data/enter_name_bg.png')
+    bg = pygame.image.load('data/enter_name_bg.jpg')
     runGame = True
     while runGame:
         screen.blit(bg, (0, 0))
-        displaytext('Enter your name and press "Enter"', 5, 60, pygame.Color('green'))
+        displaytext('Enter your name and press "Enter"', 30, 60, pygame.Color('green'))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 runGame = False
@@ -25,6 +25,6 @@ def main():
                     player_name = player_name[:-1]
                 else:
                     player_name += event.unicode
-        displaytext(player_name, 100, 80, pygame.Color('purple'))
+        displaytext(player_name, 100, 300, pygame.Color('purple'))
         pygame.display.flip()
     pygame.quit()
