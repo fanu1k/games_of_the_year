@@ -34,18 +34,21 @@ def displaytext(text, x, y, color, flag):
         textpos.top = 300
     screen.blit(text, textpos)
 
-def get_scores(player, scores):
+def get_scores(player, score):
     conn = sqlite3.connect('leaders_base.db')
     c = conn.cursor()
     scores_old = c.execute("SELECT scores FROM leaders where player == '%s'" % player).fetchone()
     conn.close()
-    return max(scores, scores_old[0])
+    try:
+        return max(score, scores_old[-1])
+    except Exception:
+        return score
 
-def fill_table(player, scores):
+def fill_table(player, score):
     conn = sqlite3.connect('leaders_base.db')
     c = conn.cursor()
     c.execute("INSERT INTO leaders(player, scores) VALUES ('%s','%s')" % (
-        player, get_scores(player, scores)))
+        player, get_scores(player, score)))
     conn.commit()
     conn.close()
 
@@ -432,9 +435,11 @@ def main(lvl):
 
 
 def run():
+    global scores
     global player_name
     player_name = enter_name.main()
     for i in range(0, 10):
         tmp = main(i)
         if not tmp:
+            scores = 0
             break
