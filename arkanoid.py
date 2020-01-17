@@ -64,7 +64,7 @@ class Bonus(pygame.sprite.Sprite):
             self.skill = 'balls'
         if bonus == 2:
             self.image.fill(pygame.Color("white"))
-            self.skill = 'normal'
+            self.skill = '+width'
         if bonus == 3:
             self.image.fill(pygame.Color("pink"))
             self.skill = 'slow'
@@ -85,7 +85,7 @@ class Bonus(pygame.sprite.Sprite):
         self.rect.y = coord[-1]
 
     def update(self):
-        self.rect.y += 5
+        self.rect.y += 3
 
     def bonus_skill(self):
         return self.skill
@@ -106,7 +106,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.lifes = lifes
-        if rnd(0, 100) < 40:
+        if rnd(0, 100) < 50:
             self.bonus = True
         else:
             self.bonus = False
@@ -189,11 +189,6 @@ class Ball(pygame.sprite.Sprite):
     def isfire(self):
         return self.fire
 
-    def slow_speed(self):
-        self.speed = 7
-
-    def high_speed(self):
-        self.speed = 20
 
 
 class Player(pygame.sprite.Sprite):
@@ -202,7 +197,7 @@ class Player(pygame.sprite.Sprite):
 
         super().__init__()
 
-        self.width = width
+        self.width = width if width >= 15 else 15
         self.height = 15
         self.image = pygame.Surface([self.width, self.height])
         self.image.fill((pygame.Color('purple')))
@@ -332,11 +327,9 @@ def main(lvl):
 
         collide_ball = pygame.sprite.spritecollide(player, balls, False)
         if len(collide_ball) > 0:
-            diff = (player.rect.x + player.width / 2) - \
-                (collide_ball[-1].rect.x + collide_ball[-1].width / 2)
             collide_ball[-1].rect.y = screen.get_height() - \
                 player.rect.height - collide_ball[-1].rect.height - 1
-            collide_ball[-1].bounce(diff)
+            collide_ball[-1].bounce(0)
             music(1)
 
         deadbonus = pygame.sprite.spritecollide(player, bonuses, True)
@@ -352,14 +345,16 @@ def main(lvl):
                     ball.bounce(rnd(0, 360))
             elif bonus.bonus_skill() == '-width':
                 player.update(False)
+                width = player.width
                 player.kill()
-                player = Player(30)
+                player = Player(width - 15)
                 allsprites.add(player)
                 player.update()
-            elif bonus.bonus_skill() == 'normal':
+            elif bonus.bonus_skill() == '+width':
                 player.update(False)
+                width = player.width
                 player.kill()
-                player = Player()
+                player = Player(width + 15)
                 allsprites.add(player)
                 player.update()
             elif bonus.bonus_skill() == 'fireball':
@@ -370,12 +365,13 @@ def main(lvl):
                 ball.bounce(rnd(0, 360))
             elif bonus.bonus_skill() == 'slow':
                 for ball in balls:
-                    ball.slow_speed()
+                    ball.speed -= 2
             elif bonus.bonus_skill() == 'fast':
                 for ball in balls:
-                    ball.high_speed()
+                    ball.speed += 2
             elif bonus.bonus_skill() == 'life':
                 life += 1
+
 
         for ball in balls:
             deadblocks = pygame.sprite.spritecollide(ball, blocks, False)
@@ -417,7 +413,7 @@ def main(lvl):
                     three_lvl_deadblocks[i].kill()
 
         if len(blocks) == 0:
-            displaytext(f"lvl {lvl+2}", 400, 300, pygame.Color('white'), True)
+            displaytext(f"lvl {lvl+1}", 400, 300, pygame.Color('white'), True)
             pygame.display.flip()
             sleep(1)
             return True
